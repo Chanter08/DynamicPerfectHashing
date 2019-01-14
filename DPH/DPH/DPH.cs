@@ -8,10 +8,10 @@ namespace DPH
 {
     public interface DPH
     {
-        void Insert(int x, Object data);
+        void Insert(int x, Object data, bool strategy);
 
-        void Delete(int x);
+        void Delete(int x,bool strategy);
 
-        bool Lookup(int x);
+        bool Lookup(int x, bool strategy);
     }
 }

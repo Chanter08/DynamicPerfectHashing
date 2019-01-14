@@ -19,10 +19,14 @@ namespace DPH
             this.m = m;
         }
 
-        public int hash(int x)
+        public int hash(int x, bool s)
         {
-
-            int result = (int)(((a * (long)x + b) % DPHimp.P) % this.m);
+            int result;
+            if (s)
+            {
+                result = (int)(((a * (long)x + b) % DPHimp.P) % this.m);
+            }
+            else result = (int)(((a * (long)x) % DPHimp.P) % this.m);
 
             return result;
         }

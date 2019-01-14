@@ -19,10 +19,10 @@ namespace DPH
         protected HashFunction h = null;
         protected int count = 0;
 
-        public abstract void Delete(int x);
+        public abstract void Delete(int x, bool strategy);
 
-        public abstract void Insert(int x, object data);
+        public abstract void Insert(int x, object data, bool strategy);
 
-        public abstract bool Lookup(int x);
+        public abstract bool Lookup(int x, bool strategy);
     }
 }

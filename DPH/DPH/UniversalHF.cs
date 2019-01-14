@@ -8,7 +8,6 @@ namespace DPH
 {
     public class UniversalHF
     {
-
         private UniversalHF() { }
 
         public static HashFunction GenerateHF(int m)

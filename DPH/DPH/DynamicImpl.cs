@@ -21,7 +21,7 @@ namespace DPH
 
         protected DynamicBin[] dpHash = null;
 
-        public DynamicImpl(int uniSize, int p, double step, bool increment)
+        public DynamicImpl(int uniSize, int p, double step, bool increment,bool strategy)
         {
             DynamicImpl.MAX_UNI_SIZE = uniSize;
             DynamicImpl.P = p;
@@ -29,10 +29,10 @@ namespace DPH
             DynamicImpl.increment = increment;
             this.dpHash = new DynamicBin[DPHimp.SM];
 
-            this.rehash(-1);
+            this.rehash(-1,strategy);
         }
 
-        public override void Insert(int x, object data)
+        public override void Insert(int x, object data, bool strategy)
         {
             try {
                 reader.EnterWriteLock();
@@ -40,16 +40,16 @@ namespace DPH
 
                 if (this.count > DynamicImpl.M)
                 {
-                    this.rehash(x);
+                    this.rehash(x,strategy);
                 }
                 else
                 {
-                    int j = this.h.hash(x);
+                    int j = this.h.hash(x,strategy);
                     int location = -1;
                     //
                     if (this.dpHash[j].m > 0)
                     {
-                        location = this.dpHash[j].h.hash(x); //
+                        location = this.dpHash[j].h.hash(x,strategy); //
                     }
 
                     if ((location != -1) && (this.dpHash[j].bin[location] != null) && (this.dpHash[j].bin[location].getValue() == x))
@@ -98,7 +98,7 @@ namespace DPH
                                     for (int i = 0; i < l.Count; i++)
                                     {
                                         Entry e = (Entry)l[i];
-                                        int y = this.dpHash[j].h.hash(e.getValue());
+                                        int y = this.dpHash[j].h.hash(e.getValue(),strategy);
 
                                         if (this.dpHash[j].bin[y] != null)
                                         {
@@ -155,7 +155,7 @@ namespace DPH
                                     {
                                         Entry e = (Entry)l[i];
 
-                                        int y = this.dpHash[j].h.hash(e.getValue());
+                                        int y = this.dpHash[j].h.hash(e.getValue(),strategy);
 
                                         if (this.dpHash[j].bin[y] != null)
                                         {
@@ -169,7 +169,7 @@ namespace DPH
                             }
                             else
                             {
-                                this.rehash(x);
+                                this.rehash(x,strategy);
                             }
                         }
                     }
@@ -181,7 +181,7 @@ namespace DPH
             }
         }
 
-        public override void Delete(int x)
+        public override void Delete(int x,bool strategy)
         {
             try
             {
@@ -189,11 +189,11 @@ namespace DPH
 
                 this.count++;
 
-                int j = this.h.hash(x);
+                int j = this.h.hash(x,strategy);
 
                 if (this.dpHash[j] != null)
                 {
-                    int loc = this.dpHash[j].h.hash(x);
+                    int loc = this.dpHash[j].h.hash(x,strategy);
 
                     if (this.dpHash[j].bin[loc] != null)
                     {
@@ -203,24 +203,24 @@ namespace DPH
 
                 if (this.count >= DPHimp.M)
                 {
-                    this.rehash(-1);
+                    this.rehash(-1,strategy);
                 }
             }
             finally { reader.ExitWriteLock(); }
 
         }
 
-        public override bool Lookup(int x)
+        public override bool Lookup(int x,bool strategy)
         {
             try
             {
                 reader.EnterReadLock();
 
-                int j = this.h.hash(x);
+                int j = this.h.hash(x,strategy);
 
                 if ((this.dpHash[j] != null) && (this.dpHash[j].b > 0))
                 {
-                    int loc = this.dpHash[j].h.hash(x);
+                    int loc = this.dpHash[j].h.hash(x,strategy);
 
                     if ((this.dpHash[j].bin[loc] != null) && (this.dpHash[j].bin[loc].getValue() == x) && (!this.dpHash[j].bin[loc].Deleted()))
                     {
@@ -234,7 +234,7 @@ namespace DPH
             }
         }
 
-        protected void rehash(int x)
+        protected void rehash(int x, bool strategy)
         {
             List<Entry> l = new List<Entry>();
 
@@ -297,7 +297,7 @@ namespace DPH
                 for (int i = 0; i < l.Count; ++i)
                 {
                     Entry e = (Entry)l[i];
-                    int bucket = this.h.hash(e.getValue());
+                    int bucket = this.h.hash(e.getValue(),strategy);
 
                     sublists[bucket].Add(e);
                 }
@@ -337,7 +337,7 @@ namespace DPH
                         for (int i = 0; i < sublists[j].Count; ++i)
                         {
                             Entry e = (Entry)sublists[j][i];
-                            int loc = this.dpHash[j].h.hash(e.getValue());
+                            int loc = this.dpHash[j].h.hash(e.getValue(),strategy);
 
                             if (this.dpHash[j].bin[loc] != null)
                             {
